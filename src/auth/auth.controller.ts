@@ -1,7 +1,8 @@
-import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -40,5 +41,14 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   async login(@Body() body: { email: string; password: string }) {
     return this.authService.login(body.email, body.password);
+  } 
+  
+  @Post('refresh')
+  @HttpCode(200)
+  @ApiBody({type: RefreshTokenDto})
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
+  @ApiResponse({ status: 401, description: 'Invalid refresh token.' })
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 }
